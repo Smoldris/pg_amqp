@@ -193,6 +193,12 @@ local_amqp_get_bs(broker_id) {
         goto busted;
       }
       amqp_set_sockfd(bs->conn, bs->sockfd);
+
+      if (amqp_send_header(bs->conn) < 0) {
+        elog(WARNING, "amqp[%s] failed to send protocol header", host_copy);
+        goto busted;
+      }
+
       s_reply = amqp_login(bs->conn, vhost, 0, 131072,
                            0, AMQP_SASL_METHOD_PLAIN,
                            user, pass);
